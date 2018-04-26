@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+"""Build raspberry pi images
+
+Usage:
+  nursery prepare
+"""
+
+import docopt
+import subprocess
+
+
+def nursery_prepare():
+    args = ["docker", "build", "docker", "-t", "rubus/nursery-builder"]
+    subprocess.run(args, check = True)
+
+
+def main():
+    args = docopt.docopt(__doc__)
+    if args["prepare"]:
+        nursery_prepare()
+    else:
+        raise Exception("(this should never happen)")
+
+
+if __name__ == "__main__":
+    main()
