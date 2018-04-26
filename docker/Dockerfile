@@ -23,3 +23,8 @@ RUN apt-get -y update && \
         zerofree pxz \
         zip \
     && rm -rf /var/lib/apt/lists/*
+
+ENV PI_GEN_REF 2018-03-13-raspbian-stretch
+
+RUN git clone https://github.com/RPi-Distro/pi-gen /pi-gen && \
+    git -C /pi-gen checkout -b rubus $PI_GEN_REF
