@@ -12,6 +12,7 @@ RUN apt-get -y update && \
         grep \
         libcap2-bin \
         parted \
+        pxz \
         qemu-user-static \
         quilt \
         realpath \
@@ -20,14 +21,12 @@ RUN apt-get -y update && \
         vim \
         xxd \
         xz-utils \
-        zerofree pxz \
+        zerofree \
         zip \
     && rm -rf /var/lib/apt/lists/*
 
-ENV PI_GEN_REF 2018-03-13-raspbian-stretch
+RUN git clone https://github.com/RPi-Distro/pi-gen /pi-gen
 
-RUN git clone https://github.com/RPi-Distro/pi-gen /pi-gen && \
-    git -C /pi-gen checkout -b rubus $PI_GEN_REF
-
+WORKDIR /pi-gen
 VOLUME /pi-gen/work
 VOLUME /pi-gen/deploy
