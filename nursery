@@ -10,7 +10,7 @@ import subprocess
 
 
 def nursery_prepare():
-    args = ["docker", "build", "docker", "-t", "rubus/nursery-builder"]
+    args = ["docker", "build", ".", "-t", "rubus/nursery-builder"]
     subprocess.run(args, check = True)
 
 
