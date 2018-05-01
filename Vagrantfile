@@ -35,4 +35,11 @@ Vagrant.configure(2) do |config|
   config.vm.provision :shell do |shell|
     shell.path = 'provision/setup-deps.sh'
   end
+  config.vm.provision :file do |file|
+    file.source = './scripts'
+    file.destination = '~vagrant/bin'
+  end
+  config.vm.provision :shell do |shell|
+    shell.inline = "mv ~vagrant/bin/* /usr/local/bin && rmdir ~vagrant/bin"
+  end
 end
