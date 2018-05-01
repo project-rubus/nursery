@@ -40,7 +40,8 @@ docker run --rm -it \
 ``` shell
 vagrant up
 vagrant ssh
-nursery-build /pi-gen
+cd /pi-gen
+sudo nursery-build
 ```
 
 
