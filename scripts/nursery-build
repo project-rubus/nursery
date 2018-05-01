@@ -70,8 +70,10 @@ def unlink_stage(root, name, number):
 def run(root, image_name, stages, start_at):
     try:
         prepare_source_tree(root, image_name, stages, start_at)
-        subprocess.run("{}/build.sh".format(root), cwd=root)
+        subprocess.run("{}/build.sh".format(root), cwd=root, check=True)
+        print("Success!")
     finally:
+        print("Restoring source tree")
         restore_source_tree(root, stages, start_at)
 
 
