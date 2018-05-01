@@ -8,18 +8,21 @@ Options:
 --start=<n>    Stage number to start from
 """
 
-import docopt
+import glob
 import os
 import os.path
 import subprocess
 
+import docopt
+
 CUSTOM_STAGE_PATH = "custom-stages"
+SKIPPED_OFFICIAL_STAGES = (3, 4, 5)  # desktop, raspbian 4GB, raspbian offial
 
 
 def prepare_source_tree(root, image_name, stages, start_at):
-    disable_stage(root, 3, "disabled")  # desktop
-    disable_stage(root, 4, "disabled")  # raspbian 4GB
-    disable_stage(root, 5, "disabled")  # raspbian official
+    for i in SKIPPED_OFFICIAL_STAGES:
+        disable_stage(root, i, "disabled")
+        disable_export(root, i)
     for i, nm in enumerate(stages, 6):
         link_stage(root, nm, i)
     for i in range(start_at):
@@ -31,11 +34,11 @@ def prepare_source_tree(root, image_name, stages, start_at):
 def restore_source_tree(root, stages, start_at):
     for i in range(start_at):
         enable_stage(root, i)
-    enable_stage(root, 3)  # desktop
-    enable_stage(root, 4)  # raspbian 4GB
-    enable_stage(root, 5)  # raspbian official
     for i, nm in enumerate(stages, 6):
         unlink_stage(root, nm, i)
+    for i in SKIPPED_OFFICIAL_STAGES:
+        restore_export(root, i)
+        enable_stage(root, i)
 
 
 def disable_stage(root, number, reason):
@@ -51,6 +54,24 @@ def enable_stage(root, number):
     path = "{root}/stage{number}/SKIP".format(root=root, number=number)
     if os.path.exists(path):
         os.remove(path)
+
+
+def disable_export(root, number):
+    path_export = glob.glob("{root}/stage{number}/EXPORT_*".format(
+        root=root, number=number))
+    for f in path_export:
+        print("Disabling export for stage {}: {}".format(
+            number, os.path.basename(f).replace("EXPORT_", "")))
+        os.rename(f, f.replace("EXPORT_", "_EXPORT_"))
+
+
+def restore_export(root, number):
+    path_export = glob.glob("{root}/stage{number}/_EXPORT_*".format(
+        root=root, number=number))
+    for f in path_export:
+        print("Restoring export for stage {}: {}".format(
+            number, os.path.basename(f).replace("_EXPORT_", "")))
+        os.rename(f, f.replace("_EXPORT_", "EXPORT_"))
 
 
 def link_stage(root, name, number):
