@@ -5,6 +5,7 @@ nursery-build [options] [<stages>...]
 Options:
 --root=<path>  Path to the root
 --name=<name>  Image name [default: rubus-base]
+--start=<n>    Stage number to start from
 """
 
 import docopt
@@ -15,17 +16,21 @@ import subprocess
 CUSTOM_STAGE_PATH = "custom-stages"
 
 
-def prepare_source_tree(root, image_name, stages):
-    disable_stage(root, 3)  # desktop
-    disable_stage(root, 4)  # raspbian 4GB
-    disable_stage(root, 5)  # raspbian official
+def prepare_source_tree(root, image_name, stages, start_at):
+    disable_stage(root, 3, "disabled")  # desktop
+    disable_stage(root, 4, "disabled")  # raspbian 4GB
+    disable_stage(root, 5, "disabled")  # raspbian official
     for i, nm in enumerate(stages, 6):
         link_stage(root, nm, i)
+    for i in range(start_at):
+        disable_stage(root, i, "skipped")
     with open("{}/config".format(root), "w+") as f:
         f.write("IMG_NAME={}\n".format(image_name))
 
 
-def restore_source_tree(root, stages):
+def restore_source_tree(root, stages, start_at):
+    for i in range(start_at):
+        enable_stage(root, i)
     enable_stage(root, 3)  # desktop
     enable_stage(root, 4)  # raspbian 4GB
     enable_stage(root, 5)  # raspbian official
@@ -33,8 +38,8 @@ def restore_source_tree(root, stages):
         unlink_stage(root, nm, i)
 
 
-def disable_stage(root, number):
-    print("Disabling stage {}".format(number))
+def disable_stage(root, number, reason):
+    print("Disabling stage {} ({})".format(number, reason))
     path = "{root}/stage{number}/SKIP".format(root=root, number=number)
     if not os.path.exists(path):
         with open(path, "w+") as f:
@@ -62,15 +67,15 @@ def unlink_stage(root, name, number):
         os.remove(path)
 
 
-def run(root, image_name, stages):
+def run(root, image_name, stages, start_at):
     try:
-        prepare_source_tree(root, image_name, stages)
+        prepare_source_tree(root, image_name, stages, start_at)
         subprocess.run("{}/build.sh".format(root), cwd=root)
     finally:
-        restore_source_tree(root, stages)
+        restore_source_tree(root, stages, start_at)
 
 
 if __name__ == "__main__":
     args = docopt.docopt(__doc__)
     root = args["--root"] or "."
-    run(root, args['--name'], args['<stages>'])
+    run(root, args['--name'], args['<stages>'], int(args['--start']))
