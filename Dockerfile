@@ -22,11 +22,18 @@ RUN apt-get -y update && \
         xxd \
         xz-utils \
         zerofree \
-        zip \
-    && rm -rf /var/lib/apt/lists/*
+        zip
+
+RUN apt-get -y update && \
+    apt-get -y install \
+        python3 \
+        python3-docopt
 
 RUN git clone https://github.com/RPi-Distro/pi-gen /pi-gen
 
 WORKDIR /pi-gen
 VOLUME /pi-gen/work
 VOLUME /pi-gen/deploy
+VOLUME /pi-gen/custom-stages
+
+COPY scripts /usr/local/bin

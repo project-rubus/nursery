@@ -1,2 +1,7 @@
+# This is going to a whitelisted docker build - start by removing
+# everything
 *
+
+# This is currently all we need:
 !Dockerfile
+!scripts
