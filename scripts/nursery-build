@@ -101,4 +101,4 @@ def run(root, image_name, stages, start_at):
 if __name__ == "__main__":
     args = docopt.docopt(__doc__)
     root = args["--root"] or "."
-    run(root, args['--name'], args['<stages>'], int(args['--start']))
+    run(root, args['--name'], args['<stages>'], int(args['--start'] or 0))
