@@ -19,6 +19,31 @@ Using vagrant requires that vagrant and vmware are installed, but other than tha
 
 ## Usage
 
+### Docker
+
+```shell
+docker build -t rubus/nursery-builder .
+docker volume create rubus-work
+docker volume create rubus-deploy
+docker run --rm -it \
+       --privileged \
+       -v rubus-work:/pi-gen/work \
+       -v rubus-deploy:/pi-gen/deploy \
+       -v ${PWD}/stages:/pi-gen/custom-stages:ro \
+       rubus/nursery-builder \
+       nursery-build
+```
+
+
+### Vagrant
+
+``` shell
+vagrant up
+vagrant ssh
+nursery-build /pi-gen
+```
+
+
 ```
 pip3 install -r requirements.txt
 ./nursery prepare
